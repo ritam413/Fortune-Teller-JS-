@@ -3,34 +3,32 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import {dirname} from 'path'
 import {fortuneTeller} from './routes/fortuneteller.js'
+import cors from 'cors';
 
 
 const __filename = dirname(fileURLToPath(import.meta.url))
 const __dirname=dirname(__filename)
 
 const app = express()
-const port = 3000
 
+// ✅ Allow CORS from Netlify frontend
+app.use(cors({
+  origin: 'https://fortune-wxy.netlify.app' // Replace with your real Netlify URL
+}));
 //Middleware to parse JSON Bodies 
 
 app.use(express.json())
 
-const fortunes = {
-  1: "You will have a great day!",
-  2: "Something unexpected will come your way.",
-  3: "Be cautious of new opportunities.",
-  // add more as needed
-};
 
 // Serve static files from public/
-app.use('/fortuneteller',express.static('public'));
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
 app.get('/fortuneteller', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Fortuneteller/public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.post('/fortuneteller',(req,res)=>{
@@ -48,6 +46,8 @@ app.post('/fortuneteller',(req,res)=>{
   res.json({message:fortune,input:userInput})
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+// Port setup for Render and local dev
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`);
+});
